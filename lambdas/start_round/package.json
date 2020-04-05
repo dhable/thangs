@@ -1,0 +1,14 @@
+{
+  "name": "start_round",
+  "version": "0.1.0",
+  "description": "AWS Lambda function is called to start a new round of the game.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "zip ../start_round.zip *"
+  },
+  "author": "Dan Hable",
+  "dependencies": {
+    "aws-sdk": "^2.650.0"
+  }
+}

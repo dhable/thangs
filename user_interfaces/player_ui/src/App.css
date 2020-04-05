@@ -1,0 +1,42 @@
+.App {
+  text-align: center;
+  color: White;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.App-title {
+  margin-bottom: 3em;
+}
+
+.App-input {
+  /*background-color: White;*/
+  padding: 1em;
+  margin-top: 3em;
+}
+
+.App-input-text {
+  width: 90%;
+  margin: 2em 0;
+  padding: 1em;
+}
+
+.App-input-btn {
+  width: 100%;
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}

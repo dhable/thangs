@@ -1,0 +1,15 @@
+{
+  "name": "create_game",
+  "version": "0.1.0",
+  "description": "AWS lambda function that actually creates a new game and sets everything up.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "npm install && zip -r ../create_game.zip *"
+  },
+  "author": "Dan Hable",
+  "dependencies": {
+    "aws-sdk": "^2.650.0",
+    "sha3": "^2.1.2"
+  }
+}

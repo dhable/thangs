@@ -1,0 +1,14 @@
+{
+  "name": "submit_answer",
+  "version": "0.1.0",
+  "description": "AWS Lambda function that handles the send by player pad UI when a user clicks the answer button",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "zip ../submit_answer.zip *"
+  },
+  "author": "Dan Hable",
+  "dependencies": {
+    "aws-sdk": "^2.650.0"
+  }
+}

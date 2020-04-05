@@ -1,0 +1,14 @@
+{
+  "name": "end_round",
+  "version": "0.1.0",
+  "description": "AWS Lambda function that handles ending a round",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "zip ../end_round.zip *"
+  },
+  "author": "Dan Hable",
+  "dependencies": {
+    "aws-sdk": "^2.650.0"
+  }
+}
