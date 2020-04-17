@@ -1,78 +1,115 @@
-import React from 'react';
-import './App.css';
-import Websocket from "react-websocket";
-import CreateGame from "./CreateGame";
-import Question from "./Question";
+import React, {useState} from 'react';
+import styled from 'styled-components';
+import Websocket from 'react-websocket';
 
-class App extends React.Component {
+import ApplicationBar from './components/ApplicationBar';
+import Copyright from './components/Copyright';
+import PlayerControls from './components/PlayerControls';
+import GameBoard from './components/GameBoard';
+import LoadingBackdrop from './components/LoadingBackdrop';
 
-    constructor(props) {
-        super(props);
-        this.state = {gameId: null, question: null, answers: null};
-    }
+const AppContainer = styled.div`
+        display: flex;
+        flex-direction: column;
+    `,
+    AppBar = styled(ApplicationBar)`
+        flex: 1;
+    `,
+    MainContent = styled.div`
+        flex: 3;
+    `,
+    Footer = styled.div`
+        flex: 1;
+    `,
+    Grid = styled.div`
+        display: flex;
+        margin: 1em;
+        align-items: stretch;
+        align-content: stretch;
+    `,
+    Left = styled.div`
+        min-width: 17em;
+        max-width: 20em;
+    `,
+    Right = styled.div`
+        flex-grow: 1;
+    `;
 
-    openHandler() {
-        console.log("opening");
-    }
+function App() {
+    const [isConnected, setConnected] = useState(false);
+    const [wsRef, setWsRef] = useState(null);
 
-    messageHandler(msg) {
-        console.log(msg);
-
-        let parsedMsg = JSON.parse(msg);
-        if (parsedMsg.response === "create_game") {
-            this.state.gameId = parsedMsg.gameId;
-        } else if (parsedMsg.response === "start_round" ) {
-            this.state.question = parsedMsg.question;
-        } else if (parsedMsg.response === "end_round") {
-            this.state.answers = parsedMsg.answer;
-        } else {
-            console.warn("unknown message = " + msg);
+    // Stateful websocket methods
+    const wsSend = (obj) => {
+        if (wsRef) {
+            wsRef.sendMessage(JSON.stringify(obj));
         }
-    }
+    };
 
-    send(obj) {
-        if (this.wsReference) {
-            this.wsReference.sendMessage(JSON.stringify(obj));
-        } else {
-            console.warn("wsReference was not set");
+    const handleOnOpen = () => {
+//        wsSend({
+//            type: 'request',
+//            tx: 'create_game'
+//        });
+        setConnected(true);
+    };
+
+    const handleOnMessage = function(msgString) {
+        let message = JSON.parse(msgString);
+        if (message.type !== 'response') {
+            console.warn('Inbound websocket message was not of response type: ' + msgString);
         }
-    }
 
-    requestNextQuestion() {
-        this.state.answers = null;
-        this.send({"action": "start_round", gameId: this.state.gameId});
-    }
+        switch (message.tx) {
+            case 'create_game': // {type: 'response', tx: 'create_game', gameId: '...'}
+                setConnected(true);
+                break;
 
-    requestAnswers() {
-        this.send({"action": "end_round", gameId: this.state.gameId});
-    }
+            case 'invite_player': // {type: 'response', tx: 'invite_player', playerId: '...'}
+                break;
 
-    pickChildComponent() {
-        if (!this.state.gameId) {
-            return <CreateGame sendFn={this.send.bind(this)} />;
-        } else if (this.state.answers) {
-            // return view screen
-            return <Answer question={this.state.question} answers={this.state.answers} nextFn={this.requestNextQuestion.bind(this)} />;
-        } else {
-            return <Question question={this.state.question} nextFn={this.requestAnswers.bind(this)} />;
+            case 'start_round': // {type: 'response', 'tx': 'start_round', q: '...'}
+                break;
+
+            case 'answer_event': // {type: 'response', tx: 'answer_event', count: 4, total: 8}
+                break;
+
+            case 'end_round': // {type: 'response', tx: 'end_round', answers: ['...', '...', ...]}
+                break;
+
+            case 'kick_player': // {type: 'response', tx: 'kick_player', players: [...]}}
+                break;
+
+            default:
+                console.warn('Inbound message specifies an unknown tx: ' + msgString);
         }
-    }
+    };
 
-    render() {
-        return (
-            <div className="App">
-                {this.pickChildComponent()}
-                <Websocket url="wss://71wrpotbp9.execute-api.us-east-2.amazonaws.com/prod"
-                           onOpen={this.openHandler}
-                           onMessage={this.messageHandler}
-                           reconnect={true}
-                           debug={true}
-                           ref={ws => {
-                               this.wsReference = ws;
-                           }} />
-            </div>
-        );
-    }
+    return (
+        <AppContainer>
+            <LoadingBackdrop isConnected={isConnected} />
+            <AppBar />
+            <MainContent>
+                <Grid>
+                    <Left>
+                        <PlayerControls />
+                    </Left>
+                    <Right>
+                        <GameBoard />
+                    </Right>
+                </Grid>
+            </MainContent>
+            <Footer>
+                <Copyright />
+            </Footer>
+            <Websocket url="wss://71wrpotbp9.execute-api.us-east-2.amazonaws.com/prod"
+                       onOpen={handleOnOpen}
+                       onMessage={handleOnMessage}
+                       reconnect={true}
+                       debug={true}
+                       ref={setWsRef} />
+        </AppContainer>
+    );
 }
 
 export default App;
