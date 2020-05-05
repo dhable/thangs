@@ -10,78 +10,27 @@ const DynamoDB = new AWS.DynamoDB.DocumentClient({
   region: AWS_REGION
 });
 
-const SNS = new AWS.SNS({
-  apiVersion: "2010-03-31",
-  region: "us-east-1"
-});
-
 function generateHashId(seed) {
   let hash = new SHA3(256);
-
-  hash.update(seed);
-  hash.update(process.hrtime.bigint().toString());
-
+  hash.update(`${seed}-${process.hrtime.bigint().toString()}`);
   return hash.digest("base64");
 }
 
-function createGameRecord(gameId, gameName) {
+function createGameRecord(gameId, name, connectionId) {
   let params = {
     TableName: "GAMES",
     Item: {
       GAME_ID: gameId,
-      NAME: gameName,
-      PLAYERS: [],
+      NAME: name,
+      HOST_CONN: connectionId,
+      PLAYERS: {},
       PREV_QS: [],
+      ANS_LOCK: false,
       ANSWERS: {},
       EXPIRE_TS: Math.floor((Date.now() + 43200000) / 1000) // 12 hours from now
     }
   };
-
   return DynamoDB.put(params).promise();
-}
-
-async function createInvites(gameId, num) {
-  const inviteIds = [];
-
-  for (let i = 0; i < num; i++) {
-    let playerHash = generateHashId(i.toString());
-    let params = {
-      TableName: "INVITES",
-      Item: {
-        INVITE_ID: playerHash,
-        GAME_ID: gameId,
-        EXPIRE_TS: Math.floor((Date.now() + 43200000) / 1000) // 12 hours from now
-      }
-    };
-
-    await DynamoDB.put(params).promise();
-    inviteIds.push(playerHash);
-  }
-
-  return inviteIds;
-}
-
-function sendInvites(txtnums, inviteHashes) {
-  let promises = [];
-
-  for (let i = 0; i < txtnums.length; i++) {
-    let txtnum = txtnums[i];
-    let invite = inviteHashes[i];
-    let params = {
-      Message: `Join your game of Thangs - https://thangs.caffeinatedideas.com/player#${invite}`,
-      PhoneNumber: txtnum,
-      MessageAttributes: {
-        "SMSType": {
-          "StringValue": "Transactional",
-          "DataType": "String"
-        }
-      }
-    };
-
-    promises.push(SNS.publish(params).promise());
-  }
-
-  return promises;
 }
 
 function sendResponse(reqCtx, payload) {
@@ -98,16 +47,10 @@ function sendResponse(reqCtx, payload) {
 
 exports.handler = async (event) => {
   try {
-    const { name, txtnums } = JSON.parse(event.body);
-    const gameId = generateHashId(name);
-
-    await createGameRecord(gameId, name);
-
-    const inviteHashes = await createInvites(gameId, txtnums.length);
-    await sendInvites(txtnums, inviteHashes);
-
-    await sendResponse(event.requestContext, {gameId});
-
+    const { type, tx, name } = JSON.parse(event.body);
+    const gameId = generateHashId(tx);
+    await createGameRecord(gameId, name, event.requestContext.connectionId);
+    await sendResponse(event.requestContext, { type, tx, gameId });
     return SUCCESS;
   } catch (e) {
     console.warn(e);

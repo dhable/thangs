@@ -1,14 +1,18 @@
 {
-  "name": "end_round",
+  "name": "end-round",
   "version": "0.1.0",
   "description": "AWS Lambda function that handles ending a round",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "package": "zip ../end_round.zip *"
+    "clean": "rm -f ../bin/$npm_package_name-$npm_package_version.zip && rm -Rf node_modules",
+    "build": "npm install",
+    "package:init": " mkdir -p ../bin",
+    "package:prune": "npm prune --production",
+    "package:zip": "zip -r ../bin/$npm_package_name-$npm_package_version.zip *",
+    "package": "npm run clean && npm run build && npm run package:init && npm run package:prune && npm run package:zip"
   },
   "author": "Dan Hable",
-  "dependencies": {
+  "devDependencies": {
     "aws-sdk": "^2.650.0"
   }
 }

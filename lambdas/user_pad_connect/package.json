@@ -1,7 +1,7 @@
 {
-  "name": "create-game",
+  "name": "user-pad-connect",
   "version": "0.1.0",
-  "description": "AWS lambda function that actually creates a new game and sets everything up.",
+  "description": "AWS Lambda function that handles a user joining a game on their phone with the mobile pad UI.",
   "main": "index.js",
   "scripts": {
     "clean": "rm -f ../bin/$npm_package_name-$npm_package_version.zip && rm -Rf node_modules",
@@ -12,9 +12,6 @@
     "package": "npm run clean && npm run build && npm run package:init && npm run package:prune && npm run package:zip"
   },
   "author": "Dan Hable",
-  "dependencies": {
-    "sha3": "^2.1.2"
-  },
   "devDependencies": {
     "aws-sdk": "^2.650.0"
   }

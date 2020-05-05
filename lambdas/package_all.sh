@@ -2,10 +2,11 @@
 
 functions=(
   "create_game"
-  "register_user_session"
+  "invite_player"
   "start_round"
   "submit_answer"
   "end_round"
+  "user_pad_connect"
 )
 
 for i in "${functions[@]}"

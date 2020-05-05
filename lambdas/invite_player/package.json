@@ -1,7 +1,7 @@
 {
-  "name": "create-game",
+  "name": "invite-players",
   "version": "0.1.0",
-  "description": "AWS lambda function that actually creates a new game and sets everything up.",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "clean": "rm -f ../bin/$npm_package_name-$npm_package_version.zip && rm -Rf node_modules",
