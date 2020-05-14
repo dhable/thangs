@@ -35,26 +35,26 @@ function PlayerInfo(props) {
     );
 }
 
-function PlayerControls() {
-    // mock stuff
-     const players = [
-            {"name": "John", "phone": "123456789", "status": "connected"},
-            {"name": "Bob", "phone": "123456789", "status": "disconnected"}
-        ];
-
-        const playerInfoDom = [];
-        players.forEach(playerProps => {
-            playerInfoDom.push(
-                <PlayerInfo {...playerProps} />
-            );
-        });
-    // end mock stuff
+function PlayerControls(props) {
+    const { players, addNewPlayer } = props;
+    const playerInfoDom = [];
+    players.forEach( p => {
+        playerInfoDom.push(
+            <PlayerInfo name={"John Doe"}
+                        phone={"123"}
+                        status={"invited"}/>
+        );
+    });
 
     const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
 
     const handlePlayerDialogOpen = () => setPlayerDialogOpen(true);
     const handlePlayerDialogClose = () => setPlayerDialogOpen(false);
-    const handlePlayerDialogAdd = () => setPlayerDialogOpen(false);
+    const handlePlayerDialogAdd = () => {
+        alert(arguments);
+        console.dir(arguments);
+        setPlayerDialogOpen(false);
+    };
 
     return (
         <PlayerControlContainer>

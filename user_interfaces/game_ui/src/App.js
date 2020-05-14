@@ -37,6 +37,8 @@ const AppContainer = styled.div`
 
 function App() {
     const [isConnected, setConnected] = useState(false);
+    const [gameId, setGameId] = useState(null);
+    const [players, setPlayers] = useState([]);
     const [wsRef, setWsRef] = useState(null);
 
     // Stateful websocket methods
@@ -47,25 +49,22 @@ function App() {
     };
 
     const handleOnOpen = () => {
-//        wsSend({
-//            type: 'request',
-//            tx: 'create_game'
-//        });
+        wsSend({
+            type: 'create-game',
+            tx: new Date().getTime()
+        });
         setConnected(true);
     };
 
     const handleOnMessage = function(msgString) {
         let message = JSON.parse(msgString);
-        if (message.type !== 'response') {
-            console.warn('Inbound websocket message was not of response type: ' + msgString);
-        }
-
-        switch (message.tx) {
-            case 'create_game': // {type: 'response', tx: 'create_game', gameId: '...'}
+        switch (message.type) {
+            case 'create-game': // {type: 'response', tx: 'create_game', gameId: '...'}
                 setConnected(true);
+                setGameId(message.gameId);
                 break;
 
-            case 'invite_player': // {type: 'response', tx: 'invite_player', playerId: '...'}
+            case 'invite-player': // {type: 'response', tx: 'invite_player', playerId: '...'}
                 break;
 
             case 'start_round': // {type: 'response', 'tx': 'start_round', q: '...'}
@@ -81,7 +80,7 @@ function App() {
                 break;
 
             default:
-                console.warn('Inbound message specifies an unknown tx: ' + msgString);
+                console.warn('Inbound message specifies an unknown type or type is missing: ' + msgString);
         }
     };
 
@@ -92,7 +91,7 @@ function App() {
             <MainContent>
                 <Grid>
                     <Left>
-                        <PlayerControls />
+                        <PlayerControls players={players} />
                     </Left>
                     <Right>
                         <GameBoard />

@@ -4,10 +4,10 @@ import {Dialog, DialogTitle, DialogContent, DialogContentText, TextField, Dialog
         Button} from '@material-ui/core';
 
 function AddPlayerDialog(props) {
-    const {onClose, onAdd} = props;
+    const {open, onClose, onAdd} = props;
 
     return (
-        <Dialog {...props} >
+        <Dialog open={open}>
             <DialogTitle>Who do you want to invite?</DialogTitle>
             <DialogContent>
                 <DialogContentText>
@@ -26,7 +26,6 @@ function AddPlayerDialog(props) {
                 <Button onClick={onClose} >
                     Cancel
                 </Button>
-
                 <Button onClick={onAdd} >
                     Add
                 </Button>
